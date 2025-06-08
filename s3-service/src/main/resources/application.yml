@@ -1,0 +1,7 @@
+aws:
+  s3:
+    endpoint: http://localhost:4566   # O http://localhost:9000 para MinIO
+    region: us-east-1
+    access-key: test
+    secret-key: test
+    bucket: my-bucket-test
