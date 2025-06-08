@@ -1,0 +1,17 @@
+<configuration>
+    <appender name="CLOUDWATCH" class="ca.pjer.logback.awslogs.AwsLogsAppender">
+        <logGroup>/springboot/logs</logGroup>
+        <logStream>application-stream</logStream>
+        <region>us-east-1</region>
+        <accessKey>test</accessKey>
+        <secretKey>test</secretKey>
+        <endpoint>http://localhost:4566</endpoint> <!-- LocalStack CloudWatch -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CLOUDWATCH"/>
+    </root>
+</configuration>

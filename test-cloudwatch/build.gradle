@@ -26,14 +26,16 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // AWS SDK dependencies
-    implementation 'software.amazon.awssdk:s3:2.25.14'
-    implementation 'ca.pjer:logback-awslogs-appender:1.6.0'
+    // AWS SDK CloudWatch v2
+    implementation 'software.amazon.awssdk:cloudwatch:2.20.0'
+
+    // Logging con Logback
+    implementation 'ch.qos.logback:logback-classic:1.5.13'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
