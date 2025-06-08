@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"           # endpoint único para todos los servicios
+      - "4510-4559:4510-4559" # puertos para servicios individuales
+      - "4571:4571"           # Optional: edge port for Lambda
+    environment:
+      - SERVICES=s3,sqs,sns,lambda,dynamodb,cloudwatch,apigateway,iam,sts,secretsmanager,events,logs,ec2,route53,ssm,ecr,ecs,ses,kinesis,cloudformation,cognito-idp
+      - DEBUG=1
+      - PERSISTENCE=1
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}  # requerido para Pro
+    volumes:
+      - "./data/.localstack-data:/var/lib/localstack"   # almacenamiento persistente recomendado
+      - "/var/run/docker.sock:/var/run/docker.sock"     # necesario para Lambda y otros
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    container_name: dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://host.docker.internal:4566
+    depends_on:
+      - localstack
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"  # API S3 compatible
+      - "9001:9001"  # consola web
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123
+    command: server /data --console-address ":9001"
+    volumes:
+      - "./data/.minio-data:/data"
+    depends_on:
+      - localstack
