@@ -38,14 +38,29 @@ public class ClientHandler {
     }
 
     public Mono<ServerResponse> getClientById(ServerRequest request) {
-        return null;
+        String id = request.pathVariable("id");
+        return servicePort.getById(id)
+                .flatMap(client -> ServerResponse.ok().bodyValue(client))
+                .contextWrite(Context.of(X_MESSAGE_ID, getMessageId(request)))
+                .doOnError(error -> log.error("Error fetching client by ID: {}", error.getMessage()))
+                .onErrorResume(exception -> globalErrorHandler.handle(exception, getMessageId(request)));
     }
 
     public Mono<ServerResponse> getAllClients(ServerRequest request) {
-        return null;
+        return servicePort.getAll()
+                .collectList()
+                .flatMap(clients -> ServerResponse.ok().bodyValue(clients))
+                .contextWrite(Context.of(X_MESSAGE_ID, getMessageId(request)))
+                .doOnError(error -> log.error("Error fetching all clients: {}", error.getMessage()))
+                .onErrorResume(exception -> globalErrorHandler.handle(exception, getMessageId(request)));
     }
 
     public Mono<ServerResponse> deleteClient(ServerRequest request) {
-        return  null;
+        String id = request.pathVariable("id");
+        return servicePort.delete(id)
+                .then(ServerResponse.noContent().build())
+                .contextWrite(Context.of(X_MESSAGE_ID, getMessageId(request)))
+                .doOnError(error -> log.error("Error deleting client: {}", error.getMessage()))
+                .onErrorResume(exception -> globalErrorHandler.handle(exception, getMessageId(request)));
     }
 }
