@@ -80,3 +80,10 @@ docker run -d -p 8001:8001 --name dynamodb-admin \
 
 Abre tu navegador y accede a la consola de DynamoDB Admin en `http://localhost:8001`.
 
+## S3 Dashboard
+
+Para administrar S3, puedes usar la herramienta S3 Dashboard:
+
+![img.png](img.png)
+
+![img_1.png](img_1.png)
