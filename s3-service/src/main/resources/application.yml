@@ -5,3 +5,9 @@ aws:
     access-key: test
     secret-key: test
     bucket: my-bucket-test
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
