@@ -1,6 +1,5 @@
-package com.aws.dynamodbservice.infrastructure.common.exception;
+package com.aws.dynamodbservice.domain.exception;
 
-import com.aws.dynamodbservice.domain.exception.TechnicalMessage;
 import lombok.Getter;
 
 @Getter

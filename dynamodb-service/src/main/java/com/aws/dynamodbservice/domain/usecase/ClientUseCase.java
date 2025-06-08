@@ -4,7 +4,8 @@ import com.aws.dynamodbservice.domain.api.ClientPersistencePort;
 import com.aws.dynamodbservice.domain.exception.TechnicalMessage;
 import com.aws.dynamodbservice.domain.model.Client;
 import com.aws.dynamodbservice.domain.spi.ClientServicePort;
-import com.aws.dynamodbservice.infrastructure.common.exception.NotFoundException;
+import com.aws.dynamodbservice.domain.exception.NotFoundException;
+
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
