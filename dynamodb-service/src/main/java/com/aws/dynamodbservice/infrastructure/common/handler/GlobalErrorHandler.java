@@ -3,10 +3,7 @@ package com.aws.dynamodbservice.infrastructure.common.handler;
 import com.aws.dynamodbservice.domain.exception.BusinessException;
 import com.aws.dynamodbservice.domain.exception.DuplicateResourceException;
 import com.aws.dynamodbservice.domain.exception.TechnicalMessage;
-import com.aws.dynamodbservice.infrastructure.common.exception.DatabaseResourceException;
-import com.aws.dynamodbservice.infrastructure.common.exception.NoContentException;
-import com.aws.dynamodbservice.infrastructure.common.exception.ProcessorException;
-import com.aws.dynamodbservice.infrastructure.common.exception.TechnicalException;
+import com.aws.dynamodbservice.infrastructure.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -41,6 +38,16 @@ public class GlobalErrorHandler {
                     HttpStatus.CONFLICT,
                     messageId,
                     TechnicalMessage.ALREADY_EXISTS,
+                    List.of(ErrorDTO.of(
+                            ex.getMessage(),
+                            ex.getParameter()
+                    ))
+            );
+
+            case NotFoundException ex -> buildErrorResponse(
+                    HttpStatus.NOT_FOUND,
+                    messageId,
+                    TechnicalMessage.NOT_FOUND,
                     List.of(ErrorDTO.of(
                             ex.getMessage(),
                             ex.getParameter()

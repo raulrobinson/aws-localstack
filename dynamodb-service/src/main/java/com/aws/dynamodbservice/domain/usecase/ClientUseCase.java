@@ -1,8 +1,10 @@
 package com.aws.dynamodbservice.domain.usecase;
 
 import com.aws.dynamodbservice.domain.api.ClientPersistencePort;
+import com.aws.dynamodbservice.domain.exception.TechnicalMessage;
 import com.aws.dynamodbservice.domain.model.Client;
 import com.aws.dynamodbservice.domain.spi.ClientServicePort;
+import com.aws.dynamodbservice.infrastructure.common.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,9 +27,11 @@ public class ClientUseCase implements ClientServicePort {
 
     @Override
     public Mono<Client> getById(String id) {
-        log.info("Fetching client with ID: {}", id);
         return persistencePort.getById(id)
-                .doOnSuccess(client -> log.info("Client retrieved successfully: {}", client))
+                .doOnSuccess(client -> {
+                    if (client == null) throw new NotFoundException(
+                            TechnicalMessage.NOT_FOUND, "Client not found with ID: ", id);
+                })
                 .doOnError(error -> log.error("Error retrieving client: {}", error.getMessage()));
     }
 

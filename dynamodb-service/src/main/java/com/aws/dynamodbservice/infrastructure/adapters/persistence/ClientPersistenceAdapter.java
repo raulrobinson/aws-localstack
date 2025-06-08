@@ -34,7 +34,10 @@ public class ClientPersistenceAdapter implements ClientPersistencePort {
 
     @Override
     public Mono<Client> getById(String id) {
-        return Mono.fromCallable(() -> mapper.toDomain(clientTable.getItem(Key.builder().partitionValue(id).build())));
+        return Mono.fromCallable(() -> mapper.toDomain(clientTable.getItem(Key.builder()
+                .partitionValue(id)
+                .build()
+        )));
     }
 
     @Override
