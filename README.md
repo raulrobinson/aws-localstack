@@ -80,6 +80,10 @@ docker run -d -p 8001:8001 --name dynamodb-admin \
 
 Abre tu navegador y accede a la consola de DynamoDB Admin en `http://localhost:8001`.
 
+## DynamoDB Resource Browser
+
+![img.png](assets/dynamodb-resource-browser.png)
+
 ## S3 Resource Browser
 
 ![img.png](assets/s3-resource-browser.png)
