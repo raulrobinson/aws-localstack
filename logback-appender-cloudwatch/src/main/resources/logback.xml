@@ -1,0 +1,15 @@
+<configuration>
+    <appender name="CLOUDWATCH" class="com.aws.ws.CloudWatchLogAppender">
+        <logGroupName>myapp/logs</logGroupName>
+        <logStreamName>springboot</logStreamName>
+        <endpoint>http://localhost:4566</endpoint> <!-- para LocalStack -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+<!--            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - [%X{x-session-id}] %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CLOUDWATCH" />
+    </root>
+</configuration>
