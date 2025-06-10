@@ -23,6 +23,18 @@
 - ***KINESIS*** Service de procesamiento de flujos de datos.
 - ***CLOUDFORMATION*** Service de gestión de infraestructura como código.
 
+### DynamoDB Resource Browser
+
+![img.png](assets/dynamodb-resource-browser.png)
+
+### S3 Resource Browser
+
+![img.png](assets/s3-resource-browser.png)
+
+### Secrets Manager
+
+![img.png](assets/secrets-manager.png)
+
 ✅ Dependencias necesarias
 Instala la CLI de LocalStack (opcional pero útil):
 
@@ -80,19 +92,7 @@ docker run -d -p 8001:8001 --name dynamodb-admin \
 
 Abre tu navegador y accede a la consola de DynamoDB Admin en `http://localhost:8001`.
 
-## DynamoDB Resource Browser
-
-![img.png](assets/dynamodb-resource-browser.png)
-
-## S3 Resource Browser
-
-![img.png](assets/s3-resource-browser.png)
-
-## Secrets Manager
-
-![img.png](assets/secrets-manager.png)
-
-## S3 Dashboard
+### (Other) S3 Dashboard
 
 Para administrar S3, puedes usar la herramienta S3 Dashboard:
 
@@ -100,179 +100,11 @@ Para administrar S3, puedes usar la herramienta S3 Dashboard:
 
 ![img_1.png](assets/img_1.png)
 
-## CloudWatch
 
-Para monitorear y visualizar logs, puedes usar la herramienta CloudWatch:
+### Author
 
-✅ Crear Log Group y Log Stream en LocalStack
+- **[Raul Bolivar Navas](https://github.com/raulrobinson)**
 
-```bash
-awslocal logs create-log-group --log-group-name /springboot/logs
-awslocal logs create-log-stream --log-group-name /springboot/logs --log-stream-name application-stream
-```
+### License
 
-✅ Ver los logs en LocalStack (CloudWatch)
-
-```bash
-awslocal logs get-log-events \
-  --log-group-name /springboot/logs \
-  --log-stream-name application-stream
-```
-
-✅ Integrar también métricas de CloudWatch
-
-1. Para enviar métricas personalizadas, necesitarías usar software.amazon.awssdk.services.cloudwatch.CloudWatchClient y reportar manualmente:
-2. Enviar métricas personalizadas a CloudWatch en LocalStack.
-3. Usar Micrometer con Spring Boot para enviar métricas automáticamente.
-
-✅ 1. Enviar métricas manualmente a CloudWatch en LocalStack (Java)
-```java
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
-import software.amazon.awssdk.services.cloudwatch.model.*;
-
-import java.net.URI;
-import java.time.Instant;
-
-public class CloudWatchMetricSender {
-
-    public static void main(String[] args) {
-        CloudWatchClient cloudWatchClient = CloudWatchClient.builder()
-                .endpointOverride(URI.create("http://localhost:4566"))
-                .region(Region.US_EAST_1)
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("test", "test")
-                ))
-                .build();
-
-        MetricDatum datum = MetricDatum.builder()
-                .metricName("RequestCount")
-                .unit(StandardUnit.COUNT)
-                .value(1.0)
-                .timestamp(Instant.now())
-                .build();
-
-        PutMetricDataRequest request = PutMetricDataRequest.builder()
-                .namespace("MyApp/Metrics")
-                .metricData(datum)
-                .build();
-
-        cloudWatchClient.putMetricData(request);
-        System.out.println("Metric sent to CloudWatch (LocalStack)");
-    }
-}
-```
-✅ 2. Micrometer + Spring Boot + CloudWatch (Java)
-```xml
-<dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-registry-cloudwatch2</artifactId>
-</dependency>
-```
-```java
-import io.micrometer.cloudwatch2.CloudWatchConfig;
-import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
-import io.micrometer.core.instrument.Clock;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
-
-import java.net.URI;
-
-@Configuration
-public class MetricsConfig {
-
-    @Bean
-    public CloudWatchMeterRegistry cloudWatchMeterRegistry() {
-        CloudWatchConfig config = new CloudWatchConfig() {
-            @Override
-            public String get(String key) {
-                return null;
-            }
-
-            @Override
-            public String namespace() {
-                return "MyApp/Metrics";
-            }
-        };
-
-        CloudWatchAsyncClient client = CloudWatchAsyncClient.builder()
-            .endpointOverride(URI.create("http://localhost:4566"))
-            .region(Region.US_EAST_1)
-            .credentialsProvider(StaticCredentialsProvider.create(
-                AwsBasicCredentials.create("test", "test")
-            ))
-            .build();
-
-        return CloudWatchMeterRegistry.builder(config)
-            .clock(Clock.SYSTEM)
-            .cloudWatchAsyncClient(client)
-            .build();
-    }
-}
-```
-
-```java
-@Autowired
-MeterRegistry registry;
-
-registry.counter("myapp.requests").increment();
-```
-
-✅ 3. Logs en CloudWatch (con Spring Boot)
-
-Para enviar logs a CloudWatch desde una aplicación Spring Boot, puedes usar la dependencia `logback-classic` junto con `logback-aws-appenders`. Aquí tienes un ejemplo de configuración:
-
-```bash
-awslocal logs create-log-group --log-group-name /myapp/logs
-awslocal logs create-log-stream --log-group-name /myapp/logs --log-stream-name app
-```
-Enviar logs manualmente (opcional):
-
-```java
-import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
-import software.amazon.awssdk.services.cloudwatchlogs.model.*;
-
-List<InputLogEvent> events = List.of(
-    InputLogEvent.builder()
-        .message("Hola desde Spring Boot")
-        .timestamp(Instant.now().toEpochMilli())
-        .build()
-);
-
-PutLogEventsRequest request = PutLogEventsRequest.builder()
-    .logGroupName("/myapp/logs")
-    .logStreamName("app")
-    .logEvents(events)
-    .build();
-
-cloudWatchLogsClient.putLogEvents(request);
-```
-
-✅ Grafana
-Conectar Grafana a CloudWatch con el plugin oficial:
-1. Iniciar Grafana (localhost:3000).
-2. Agregar un data source: CloudWatch.
-3. Utilizar las siguientes configuraciones:
-   - Region: us-east-1
-   - Access Key / Secret: test / test
-   - Endpoint: http://localhost:4566
-4. Crear paneles con métricas del namespace MyApp/Metrics.
-
-✅ Conectar Grafana a LocalStack como CloudWatch
-1. Abrir Grafana: http://localhost:3000 (usuario: admin, pass: admin).
-2. ir a Settings → Data Sources → Add a data source.
-3. Seleccionar CloudWatch.
-4. Configurar:
-   - Name: LocalStack CloudWatch
-   - Auth Provider: Access & secret key
-   - Access Key ID: test
-   - Secret Access Key: test
-   - Default Region: us-east-1
-   - Custom Endpoint: http://localstack:4566
-5. Guardar y probar la conexión.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
