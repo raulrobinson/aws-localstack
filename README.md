@@ -35,6 +35,10 @@
 
 ![img.png](assets/secrets-manager.png)
 
+### SQS Manager
+
+![img.png](assets/sqs-telemetria.png)
+
 ✅ Dependencias necesarias
 Instala la CLI de LocalStack (opcional pero útil):
 
