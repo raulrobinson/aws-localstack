@@ -88,6 +88,10 @@ Abre tu navegador y accede a la consola de DynamoDB Admin en `http://localhost:8
 
 ![img.png](assets/s3-resource-browser.png)
 
+## Secrets Manager
+
+![img.png](assets/secrets-manager.png)
+
 ## S3 Dashboard
 
 Para administrar S3, puedes usar la herramienta S3 Dashboard:
